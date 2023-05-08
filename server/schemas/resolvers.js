@@ -10,6 +10,13 @@ const resolvers = {
     user: async (parent, { username }) => {
       return User.findOne({ username }).populate('savedBooks');
     },
+    me: async (_, args, context) => {
+      console.log(context)
+      if (context.user) {
+        return User.findOne({ email: context.email });
+      }
+      throw new AuthenticationError("You need to be logged in!");
+    },
   },
 
   Mutation: {
