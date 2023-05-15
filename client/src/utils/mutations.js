@@ -1,7 +1,19 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
+
+export const LOGIN_USER = gql`
+  mutation login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      token
+      user {
+        _id
+        username
+      }
+    }
+  }
+`;
 
 export const ADD_USER = gql`
-mutation Mutation($username: String!, $email: String!, $password: String!) {
+  mutation Mutation($username: String!, $email: String!, $password: String!) {
     addUser(username: $username, email: $email, password: $password) {
       token
       user {
@@ -20,34 +32,37 @@ mutation Mutation($username: String!, $email: String!, $password: String!) {
   }
 `;
 
-export const SAVE_BOOk = gql`
-mutation SaveBook($description: String!, $bookId: String!, $title: String!) {
-    saveBook(description: $description, bookId: $bookId, title: $title) {
-      savedBooks {
-        bookId
-        title
-        description
-      }
-      username
+export const SAVE_BOOK = gql`
+mutation SaveBook($description: String!, $bookId: String!, $title: String!, $authors: [String], $image: String, $link: String) {
+  saveBook(description: $description, bookId: $bookId, title: $title, authors: $authors, image: $image, link: $link) {
+    email
+    username
+    savedBooks {
+      authors
+      bookId
+      description
+      image
+      link
+      title
     }
   }
+}
 `;
 
 export const DELETE_BOOK = gql`
-mutation DeleteBook($description: String!, $bookId: String!, $title: String!) {
-    deleteBook(description: $description, bookId: $bookId, title: $title) {
+  mutation removeBook($bookId: String!) {
+    removeBook(bookId: $bookId) {
       username
+      bookCount
       savedBooks {
-        bookId
         title
       }
     }
   }
 `;
 
-
 export const LOGIN = gql`
-mutation Login($email: String!, $password: String!) {
+  mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       token
       user {
@@ -55,4 +70,4 @@ mutation Login($email: String!, $password: String!) {
       }
     }
   }
-  `;
+`;

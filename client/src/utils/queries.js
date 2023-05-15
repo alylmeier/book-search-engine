@@ -36,13 +36,17 @@ query User($username: String!) {
 `;
 
 export const QUERY_ME = gql`
-    query Query {
-    me {
-      email
-      username
-      savedBooks {
-        bookId
-      }
+query Me {
+  me {
+    password
+    savedBooks {
+      image
+      authors
+      bookId
+      description
+      link
+      title
     }
   }
+}
 `;

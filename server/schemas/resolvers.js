@@ -11,9 +11,14 @@ const resolvers = {
       return User.findOne({ username }).populate('savedBooks');
     },
     me: async (_, args, context) => {
+      console.log("I'm tryingto find myself!")
       console.log(context)
       if (context.user) {
-        return User.findOne({ email: context.email });
+        return User.findOne({ email: context.email })
+        .select("-__v -password")
+          .populate("savedBooks");
+
+        return userData;
       }
       throw new AuthenticationError("You need to be logged in!");
     },
@@ -29,6 +34,7 @@ const resolvers = {
       return { token, user };
     },
     login: async (parent, { email, password }) => {
+      console.log("login route")
       // Look up the user by the provided email address. Since the `email` field is unique, we know that only one person will exist with that email
       const user = await User.findOne({ email });
 
@@ -51,25 +57,34 @@ const resolvers = {
       // Return an `Auth` object that consists of the signed token and user's information
       return { token, user };
     },
-    saveBook: async (parent, { username, bookId }) => {
-      return User.findOneAndUpdate(
-        { username : username },
-        {
-          $addToSet: { savedBooks: { bookId } },
-        },
-        {
-          new: true
-        }
-      );
+    saveBook: async (parent, args, context) => {
+      console.log("TRYING TO SAVE A BOOK")
+      console.log(args)
+      console.log(context.user)
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: args } },
+          { new: true, runValidators: true }
+        ).populate("savedBooks");
+
+        return updatedUser;
+      }
+
+      throw new AuthenticationError("You need to be logged in!");
     },
-    deleteBook: async (parent, { username, bookId }) => {
-      return User.findOneAndUpdate(
-        { username: username },
-        { $pull: { savedBooks:{_id: bookId} }},
-        { new: true}
+
+    deleteBook: async (parent, { bookId }, context) => {
+         if (context.user) {
+        const updatedUser = await User.findByIdAndUpdate(
+          { _id: context.user._id },
+          { $pull: { savedBooks: { bookId } } },
+          { new: true, runValidators: true }
         );
+        return updatedUser;
+      }
+      throw new AuthenticationError("You need to be logged in!");
     },
-    
   },
 };
 
